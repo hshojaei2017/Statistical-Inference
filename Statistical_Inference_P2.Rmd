@@ -1,0 +1,55 @@
+---
+title: "Part 2: Basic Inferential Data Analysis"
+author: "Hasan Shojaei"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+In Part 2 of this project, we analyze the ToothGrowth data and perform a hypothesis test, which indicates the use of two different supplement types (OJ or VC) does not cause a true difference in the average tooth growth. 
+
+## Loading the Data and Providing a Summary of the Data
+
+We will first need to load the ToothGrowth data into R environment. In this [dataset](http://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html), the response is the length of odontoblasts (cells responsible for tooth growth) in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, orange juice or ascorbic acid (a form of vitamin C and coded as VC).
+
+The structure of the data frame and a summary of the data are provided here.
+```{r, echo=TRUE}
+library(datasets)
+data(ToothGrowth)
+str(ToothGrowth)
+summary(ToothGrowth)
+```
+
+## Performing Exploratory Data Analysis
+We first use the "graphics" package to create a coplot of length vs dose, given supplement type. 
+```{r, echo=TRUE, fig.height=3.75}
+library(graphics)
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
+       xlab = "Dose (mg/day)", ylab="Tooth length")
+```
+
+We also make boxplots with respect to supplement type and dose to further explore the data. 
+```{r, echo=TRUE, fig.height=3.75}
+par(mfrow=c(1,2))
+boxplot(len~supp,data=ToothGrowth,boxwex=0.7, 
+        col=c("green", "yellow"), xlab="Supplement type", ylab="Tooth length")
+boxplot(len~as.factor(dose),data=ToothGrowth,boxwex=0.7, 
+        col=c("red", "cyan", "orange"), xlab="Dose (mg/day)", ylab="Tooth length")
+```
+
+The main observations from this section is that the tooth length increases with higher doses of both supplement types. It's also observed that the min, Q1, median and Q3 are smaller for VC supplement compared to OJ supplement, while VC supplement results in a larger max value of tooth length. 
+
+## Performing Hypothesis Test
+In this section we perform a t-test to compare tooth growth by supplement type. The null hypothesis is that the true difference in means is equal to 0. The alternative hypothesis is that the true difference in means is NOT equal to 0. Since there are two independent group of pigs in this study, we set paired=FALSE. It's also assumed that the vairances are different. 
+```{r, echo=TRUE}
+t.test(len ~ supp, data = ToothGrowth,paired=FALSE, var.equal=FALSE)
+```
+## Conclusion
+The p-value is larger than 0.05 (equivalently 0 is within 95% confidence interval). This means we have weak evidence against the null hypothesis, so we fail to reject the null hypothesis.
+
